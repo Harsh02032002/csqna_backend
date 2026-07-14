@@ -1,0 +1,16 @@
+# Dependency directories
+node_modules/
+
+# Uploads and temporary files
+uploads/
+
+# Env files (Strictly ignored, do not commit!)
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.test
+.env.production
+*.env
+*.env.local

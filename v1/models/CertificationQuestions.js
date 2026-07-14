@@ -1,0 +1,76 @@
+import mongoose from "mongoose";
+
+const CertificationQuestionsSchema = new mongoose.Schema(
+    {
+        certification: {
+            type: String,
+            required: "Question Certification is required",
+        },
+        category: {
+            type: String,
+            required: "Question category is required",
+        },
+        area: {
+            type: String,
+            required: "Question area is required",
+        },
+        question: {
+            type: String,
+            required: "Question question is required",
+        },
+        options: {
+            Option1: {
+                type: String,
+                required: "Option 1 is required",
+            },
+            Option2: {
+                type: String,
+                required: "Option 2 is required",
+            },
+            Option3: {
+                type: String,
+                required: false,  // Optional Option3
+            },
+            Option4: {
+                type: String,
+                required: false,  // Optional Option4
+            },
+        },
+        correctAnswers: {
+            type: [String],  // Array of correct options (e.g., ["Option1", "Option3"])
+            required: "Correct answer(s) are required",
+        },
+        justifications: {
+            Option1: {
+                type: String,
+                required: false,
+            },
+            Option2: {
+                type: String,
+                required: false,
+            },
+            Option3: {
+                type: String,
+                required: false,  
+            },
+            Option4: {
+                type: String,
+                required: false,
+            },
+        },
+        questionType: {
+            type: String,
+            required: "Question type is required",
+        },
+        difficultyLevel: {
+            type: String,
+            required: "Difficulty level is required",
+        },
+        
+    },
+    { timestamps: true }
+);
+
+
+
+export default mongoose.model("CertificationQuestions", CertificationQuestionsSchema);
