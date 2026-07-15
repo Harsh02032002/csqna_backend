@@ -2,13 +2,13 @@ import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
 
 // Database 1: CSQNA Main Backend
-const uri1 = "mongodb://127.0.0.1:27017/csqna";
+const uri1 = "mongodb://prashnavali_csqna:N7%40qL%235vXp%212Rm%248Hy%5E4Tk%269Zw%2A3BcMd@93.127.166.48:27017/prashnavali?authSource=prashnavali";
 const admin1 = {
   username: "admincsqna",
   first_name: "Admin",
   last_name: "CSQNA",
-  email: "admincsqna@csqna.com",
-  password: "LoreumYad@45637a",
+  email: "admin@csqna.com",
+  password: "Admin@123456",
   role: "0x88",
   isEmailVerified: true
 };
