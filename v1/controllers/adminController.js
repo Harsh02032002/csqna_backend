@@ -1007,7 +1007,6 @@ export async function DeleteClient(req, res) {
     try {
         const { id } = req.headers;
 
-        // console.log(id);
         const user = await User.findById(id);
         if (!user) {
             return res.status(200).json({
@@ -1019,8 +1018,6 @@ export async function DeleteClient(req, res) {
         }
 
         const updatedUser = await user.deleteOne();
-
-        // console.log(updatedUser);
 
         res.status(200).json({
             status: true,
@@ -1037,5 +1034,197 @@ export async function DeleteClient(req, res) {
             data: [],
             message: 'Failed to delete user'
         });
+    }
+}
+
+/**
+ * @route POST v1/admin/practice/question
+ * @desc Add a single practice question manually
+ * @access Admin
+ */
+export async function AddPracticeQuestion(req, res) {
+    try {
+        const {
+            category, area, question,
+            Option1, Option2, Option3, Option4,
+            isCorrectOption1, isCorrectOption2, isCorrectOption3, isCorrectOption4,
+            justification1, justification2, justification3, justification4,
+            questionType, difficultyLevel
+        } = req.body;
+
+        const existing = await Questions.findOne({ question });
+        if (existing) {
+            return res.status(200).json({
+                status: false, code: 409,
+                message: 'Question already exists'
+            });
+        }
+
+        const newQ = new Questions({
+            category, area, question,
+            options: {
+                Option1: toStringSafe(Option1),
+                Option2: toStringSafe(Option2),
+                Option3: toStringSafe(Option3),
+                Option4: toStringSafe(Option4),
+            },
+            correctAnswers: [
+                Boolean(isCorrectOption1) ? toStringSafe(Option1) : '',
+                Boolean(isCorrectOption2) ? toStringSafe(Option2) : '',
+                Boolean(isCorrectOption3) ? toStringSafe(Option3) : '',
+                Boolean(isCorrectOption4) ? toStringSafe(Option4) : '',
+            ],
+            justifications: {
+                Option1: toStringSafe(justification1),
+                Option2: toStringSafe(justification2),
+                Option3: toStringSafe(justification3),
+                Option4: toStringSafe(justification4),
+            },
+            questionType: toStringSafe(questionType),
+            difficultyLevel: toStringSafe(difficultyLevel),
+        });
+
+        const saved = await newQ.save();
+        res.status(200).json({ status: true, code: 200, data: saved, message: 'Question added successfully' });
+    } catch (error) {
+        console.error('Error adding practice question:', error);
+        res.status(200).json({ status: false, code: 500, message: 'Failed to add question' });
+    }
+}
+
+/**
+ * @route DELETE v1/admin/practice/question
+ * @desc Delete a single practice question by ID
+ * @access Admin
+ */
+export async function DeletePracticeQuestion(req, res) {
+    try {
+        const { id } = req.headers;
+        const deleted = await Questions.findByIdAndDelete(id);
+        if (!deleted) {
+            return res.status(200).json({ status: false, code: 404, message: 'Question not found' });
+        }
+        res.status(200).json({ status: true, code: 200, message: 'Question deleted successfully' });
+    } catch (error) {
+        console.error('Error deleting practice question:', error);
+        res.status(200).json({ status: false, code: 500, message: 'Failed to delete question' });
+    }
+}
+
+/**
+ * @route DELETE v1/admin/practice/questions/bulk
+ * @desc Bulk delete practice questions by array of IDs
+ * @access Admin
+ */
+export async function BulkDeletePracticeQuestions(req, res) {
+    try {
+        const { ids } = req.body;
+        if (!ids || !Array.isArray(ids) || ids.length === 0) {
+            return res.status(200).json({ status: false, code: 400, message: 'ids array is required' });
+        }
+        const result = await Questions.deleteMany({ _id: { $in: ids } });
+        res.status(200).json({
+            status: true, code: 200,
+            data: { deletedCount: result.deletedCount },
+            message: `${result.deletedCount} questions deleted`
+        });
+    } catch (error) {
+        console.error('Error bulk deleting practice questions:', error);
+        res.status(200).json({ status: false, code: 500, message: 'Failed to bulk delete questions' });
+    }
+}
+
+/**
+ * @route POST v1/admin/certification/question
+ * @desc Add a single certification question manually
+ * @access Admin
+ */
+export async function AddCertificationQuestion(req, res) {
+    try {
+        const {
+            certification, category, area, question,
+            Option1, Option2, Option3, Option4,
+            isCorrectOption1, isCorrectOption2, isCorrectOption3, isCorrectOption4,
+            justification1, justification2, justification3, justification4,
+            questionType, difficultyLevel
+        } = req.body;
+
+        const existing = await CertificationQuestions.findOne({ question });
+        if (existing) {
+            return res.status(200).json({ status: false, code: 409, message: 'Question already exists' });
+        }
+
+        const newQ = new CertificationQuestions({
+            certification: toStringSafe(certification),
+            category, area, question,
+            options: {
+                Option1: toStringSafe(Option1),
+                Option2: toStringSafe(Option2),
+                Option3: toStringSafe(Option3),
+                Option4: toStringSafe(Option4),
+            },
+            correctAnswers: [
+                Boolean(isCorrectOption1) ? toStringSafe(Option1) : '',
+                Boolean(isCorrectOption2) ? toStringSafe(Option2) : '',
+                Boolean(isCorrectOption3) ? toStringSafe(Option3) : '',
+                Boolean(isCorrectOption4) ? toStringSafe(Option4) : '',
+            ],
+            justifications: {
+                Option1: toStringSafe(justification1),
+                Option2: toStringSafe(justification2),
+                Option3: toStringSafe(justification3),
+                Option4: toStringSafe(justification4),
+            },
+            questionType: toStringSafe(questionType),
+            difficultyLevel: toStringSafe(difficultyLevel),
+        });
+
+        const saved = await newQ.save();
+        res.status(200).json({ status: true, code: 200, data: saved, message: 'Question added successfully' });
+    } catch (error) {
+        console.error('Error adding cert question:', error);
+        res.status(200).json({ status: false, code: 500, message: 'Failed to add question' });
+    }
+}
+
+/**
+ * @route DELETE v1/admin/certification/question
+ * @desc Delete a single certification question by ID
+ * @access Admin
+ */
+export async function DeleteCertificationQuestion(req, res) {
+    try {
+        const { id } = req.headers;
+        const deleted = await CertificationQuestions.findByIdAndDelete(id);
+        if (!deleted) {
+            return res.status(200).json({ status: false, code: 404, message: 'Question not found' });
+        }
+        res.status(200).json({ status: true, code: 200, message: 'Question deleted successfully' });
+    } catch (error) {
+        console.error('Error deleting cert question:', error);
+        res.status(200).json({ status: false, code: 500, message: 'Failed to delete question' });
+    }
+}
+
+/**
+ * @route DELETE v1/admin/certification/questions/bulk
+ * @desc Bulk delete certification questions by array of IDs
+ * @access Admin
+ */
+export async function BulkDeleteCertificationQuestions(req, res) {
+    try {
+        const { ids } = req.body;
+        if (!ids || !Array.isArray(ids) || ids.length === 0) {
+            return res.status(200).json({ status: false, code: 400, message: 'ids array is required' });
+        }
+        const result = await CertificationQuestions.deleteMany({ _id: { $in: ids } });
+        res.status(200).json({
+            status: true, code: 200,
+            data: { deletedCount: result.deletedCount },
+            message: `${result.deletedCount} questions deleted`
+        });
+    } catch (error) {
+        console.error('Error bulk deleting cert questions:', error);
+        res.status(200).json({ status: false, code: 500, message: 'Failed to bulk delete questions' });
     }
 }

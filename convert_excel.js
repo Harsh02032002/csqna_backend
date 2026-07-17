@@ -16,6 +16,21 @@ const INPUT_FILES = [
   "e:/osa-data/DPO Questionnarie Basics_14th Nov'25.xlsx",
 ];
 
+// Auto-detect certification name from filename
+function detectCertification(filePath) {
+  const name = path.basename(filePath).toUpperCase();
+  if (name.includes('AAIA')) return 'AAIA';
+  if (name.includes('DPDP')) return 'DPDP';
+  if (name.includes('DPO')) return 'DPO';
+  if (name.includes('CEH')) return 'CEH';
+  if (name.includes('CISSP')) return 'CISSP';
+  if (name.includes('CIPP')) return 'CIPP';
+  if (name.includes('ISO')) return 'ISO';
+  if (name.includes('CISA')) return 'CISA';
+  // Fallback: first word before space
+  return path.basename(filePath, '.xlsx').split(' ')[0].toUpperCase();
+}
+
 // Map difficulty level text to backend format
 function mapDifficulty(val) {
   if (!val) return 'Medium';
@@ -40,6 +55,8 @@ function safe(val) {
 }
 
 async function convertFile(inputPath) {
+  const certificationName = detectCertification(inputPath);
+  console.log(`📋 Detected Certification: ${certificationName} for ${path.basename(inputPath)}`);
   const wb = new ExcelJS.Workbook();
   await wb.xlsx.readFile(inputPath);
   const ws = wb.worksheets[0];
@@ -67,8 +84,9 @@ async function convertFile(inputPath) {
   const outWb = new ExcelJS.Workbook();
   const outWs = outWb.addWorksheet('Questions');
 
-  // Write required headers
+  // Write required headers (Certification is FIRST - required by backend model)
   const requiredHeaders = [
+    'Certification',
     'Category', 'Area', 'Question',
     'Option1', 'Option2', 'Option3', 'Option4',
     'CorrectOption1', 'CorrectOption2', 'CorrectOption3', 'CorrectOption4',
@@ -134,6 +152,7 @@ async function convertFile(inputPath) {
     const justification4 = col(row, 'Explanation 4') || '';
 
     outWs.addRow([
+      certificationName,  // Certification - required by backend
       category,
       area,
       questionText,
