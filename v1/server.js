@@ -9,8 +9,13 @@ import cors from "cors";
 import mongoose from "mongoose";
 import { PORT, URI } from "./config/index.js";
 import Router from "./routes/index.js";
+import path from "path";
+import { fileURLToPath } from "url";
 
 import EncDec from "./middleware/enc-dec.js"
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // === 1 - CREATE SERVER ===
 const server = express();
@@ -30,6 +35,9 @@ server.use(cors());
 server.disable("x-powered-by"); //Reduce fingerprinting
 server.use(express.urlencoded({ extended: false }));
 server.use(express.json());
+
+// Serve uploaded media files (images, videos) publicly
+server.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 
 EncDec(server);
 

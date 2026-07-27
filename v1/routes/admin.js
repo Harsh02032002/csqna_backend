@@ -10,11 +10,12 @@ import {
     AddPracticeQuestion, DeletePracticeQuestion, BulkDeletePracticeQuestions,
     AddCertificationQuestion, DeleteCertificationQuestion, BulkDeleteCertificationQuestions
 } from "../controllers/adminController.js";
-import { AdminListContent, UpsertContent, DeleteContent } from "../controllers/contentController.js";
+import { AdminListContent, UpsertContent, DeleteContent, UploadMedia } from "../controllers/contentController.js";
 
 import multer from "multer";
 import path from "path";
 
+// Excel upload (for practice/certification questions)
 const upload = multer({
     dest: "uploads/",
     fileFilter: (req, file, cb) => {
@@ -22,6 +23,22 @@ const upload = multer({
             cb(null, true);
         } else {
             cb(new Error("Only .xlsx files are allowed"), false);
+        }
+    },
+});
+
+// Media upload (images + videos) for CMS
+const ALLOWED_IMAGE_EXTS = [".jpg", ".jpeg", ".png", ".webp", ".gif", ".svg"];
+const ALLOWED_VIDEO_EXTS = [".mp4", ".webm", ".mov", ".avi", ".mkv"];
+const mediaUpload = multer({
+    dest: "uploads/",
+    limits: { fileSize: 200 * 1024 * 1024 }, // 200 MB max
+    fileFilter: (req, file, cb) => {
+        const ext = path.extname(file.originalname).toLowerCase();
+        if ([...ALLOWED_IMAGE_EXTS, ...ALLOWED_VIDEO_EXTS].includes(ext)) {
+            cb(null, true);
+        } else {
+            cb(new Error("Only image/video files are allowed"), false);
         }
     },
 });
@@ -109,8 +126,9 @@ router.delete("/clients/delete",
 );
 
 // ── CMS Content ───────────────────────────────────────────────────────────────
-router.get("/content",     Validate, AdminListContent);
-router.post("/content",    Validate, UpsertContent);
-router.delete("/content/:id", Validate, DeleteContent);
+router.get("/content",              Validate, AdminListContent);
+router.post("/content",             Validate, UpsertContent);
+router.delete("/content/:id",       Validate, DeleteContent);
+router.post("/upload-media",        Validate, mediaUpload.single("file"), UploadMedia);
 
 export default router;
