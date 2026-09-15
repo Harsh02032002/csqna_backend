@@ -53,6 +53,11 @@ const certificationReportsSchema = new mongoose.Schema({
         type: [String],
         default: [],
       },
+      answerStatus: {
+        type: String,
+        enum: ['Answered', 'Partial Answer', 'Unanswered'],
+        default: 'Unanswered',
+      },
       correctAnswers: {
         type: [String],
         default: [],

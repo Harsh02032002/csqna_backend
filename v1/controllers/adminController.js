@@ -850,11 +850,17 @@ export async function ListClients(req, res) {
         const limit = parseInt(req.query.limit) || 1000;
         const skip = (page - 1) * limit;
 
+        const searchRegex = new RegExp(search, 'i');
         const clients = await User.find({
-            $or: [{ name: { $regex: search } }, { email: { $regex: search } }],
+            $or: [
+              { first_name: searchRegex },
+              { last_name: searchRegex },
+              { username: searchRegex },
+              { email: searchRegex }
+            ],
             role: "0x01"
         })
-            .sort({ submitTime: -1 })
+            .sort({ createdAt: -1 })
             .skip(skip)
             .limit(limit);
 

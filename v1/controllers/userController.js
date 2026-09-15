@@ -325,7 +325,7 @@ export async function DeletePractice(req, res) {
  * @access User
  */
 export async function SaveResponse(req, res) {
-  const { testId, questionId, answer } = req.body;
+  const { testId, questionId, answer, answerStatus } = req.body;
   try {
     // Find the test by its ID
     const test = await Tests.findById(testId);
@@ -370,6 +370,11 @@ export async function SaveResponse(req, res) {
 
     // Save the user's answer in the question's `userAnswer` field
     test.testQuestions[questionIndex].userAnswer = answer;
+    if (answerStatus && ['Answered', 'Partial Answer', 'Unanswered'].includes(answerStatus)) {
+      test.testQuestions[questionIndex].answerStatus = answerStatus;
+    } else {
+      test.testQuestions[questionIndex].answerStatus = (answer && answer.length > 0) ? 'Answered' : 'Unanswered';
+    }
     // Save the updated test document
     await test.save();
 
@@ -444,6 +449,7 @@ export async function SubmitTest(req, res) {
             questionType: question.questionType,
             difficultyLevel: question.difficultyLevel,
             userAnswer: testquestion.userAnswer,
+            answerStatus: testquestion.answerStatus || (testquestion.userAnswer?.length > 0 ? 'Answered' : 'Unanswered'),
             correctAnswers: question.correctAnswers,
             justifications: question.justifications,
             score: thisScore,
@@ -463,6 +469,7 @@ export async function SubmitTest(req, res) {
               questionType: question.questionType,
               difficultyLevel: question.difficultyLevel,
               userAnswer: testquestion.userAnswer,
+              answerStatus: testquestion.answerStatus || (testquestion.userAnswer?.length > 0 ? 'Answered' : 'Unanswered'),
               correctAnswers: question.correctAnswers,
               justifications: question.justifications,
               score: 1,
@@ -476,6 +483,7 @@ export async function SubmitTest(req, res) {
               questionType: question.questionType,
               difficultyLevel: question.difficultyLevel,
               userAnswer: testquestion.userAnswer,
+              answerStatus: testquestion.answerStatus || (testquestion.userAnswer?.length > 0 ? 'Answered' : 'Unanswered'),
               correctAnswers: question.correctAnswers,
               justifications: question.justifications,
               score: 0,
@@ -1439,6 +1447,11 @@ export async function SaveCertificationResponse(req, res) {
 
     // Save the user's answer in the question's `userAnswer` field
     test.testQuestions[questionIndex].userAnswer = answer;
+    if (answerStatus && ['Answered', 'Partial Answer', 'Unanswered'].includes(answerStatus)) {
+      test.testQuestions[questionIndex].answerStatus = answerStatus;
+    } else {
+      test.testQuestions[questionIndex].answerStatus = (answer && answer.length > 0) ? 'Answered' : 'Unanswered';
+    }
     // Save the updated test document
     await test.save();
 
@@ -1513,6 +1526,7 @@ export async function SubmitCertificationTest(req, res) {
             questionType: question.questionType,
             difficultyLevel: question.difficultyLevel,
             userAnswer: testquestion.userAnswer,
+            answerStatus: testquestion.answerStatus || (testquestion.userAnswer?.length > 0 ? 'Answered' : 'Unanswered'),
             correctAnswers: question.correctAnswers,
             justifications: question.justifications,
             score: thisScore,
@@ -1532,6 +1546,7 @@ export async function SubmitCertificationTest(req, res) {
               questionType: question.questionType,
               difficultyLevel: question.difficultyLevel,
               userAnswer: testquestion.userAnswer,
+              answerStatus: testquestion.answerStatus || (testquestion.userAnswer?.length > 0 ? 'Answered' : 'Unanswered'),
               correctAnswers: question.correctAnswers,
               justifications: question.justifications,
               score: 1,
@@ -1545,6 +1560,7 @@ export async function SubmitCertificationTest(req, res) {
               questionType: question.questionType,
               difficultyLevel: question.difficultyLevel,
               userAnswer: testquestion.userAnswer,
+              answerStatus: testquestion.answerStatus || (testquestion.userAnswer?.length > 0 ? 'Answered' : 'Unanswered'),
               correctAnswers: question.correctAnswers,
               justifications: question.justifications,
               score: 0,

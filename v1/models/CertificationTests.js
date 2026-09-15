@@ -49,6 +49,11 @@ const certificationTestSchema = new mongoose.Schema({
         type: [String], // Can store multiple answers if it's a multi-select question (MSQ)
         default: [],
       },
+      answerStatus: {
+        type: String,
+        enum: ['Answered', 'Partial Answer', 'Unanswered'],
+        default: 'Unanswered',
+      },
     },
   ],
   scheduledAt: {
